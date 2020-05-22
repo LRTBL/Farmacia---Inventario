@@ -11,14 +11,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}" />
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Slab&display=swap" rel="stylesheet">
     <title>{{title}}</title>
   </head>
   <body>
-    <h1>{{title}}</h1>
-    <form action="/" method="post">
-      <input type="text" name="user" placeholder="username" />
-      <input type="text" name="password" placeholder="password" />
-      <input type="submit" value="Iniciar Sesión" />
-    </form>
+    
+    <div class="container">
+      <h1>{{title}}</h1>
+      <form action="/" method="post">
+        <input type="text" name="user" placeholder="Username" />
+        <input type="password" name="password" placeholder="Password" />
+        <input type="submit" value="Iniciar Sesión" />
+      </form>
+    </div>
+  
   </body>
 </html>
