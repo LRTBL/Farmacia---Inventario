@@ -2,7 +2,7 @@
 
 *"Sistema simple de gestión de inventario impulsado por Flask"*
 
-## VIsta General
+## Vista General
 
 La _index page_ o _summary_ cubre el resumen del sistema que contiene listas de productos y ubicaciones junto con un recuento de productos no asignados.
 En la página de productos, podemos agregar / editar / eliminar productos del sistema. La página de ubicación cubre una funcionalidad similar en el contexto de ubicaciones o almacenes.

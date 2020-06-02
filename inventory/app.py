@@ -129,7 +129,7 @@ def user():
     users = cursor.fetchall()
 
     if request.method == 'POST':
-        user_name = request.form['use_name']
+        user_name = request.form['user_name']
         password = request.form['password']
         names = request.form['names']
         last_name = request.form['last_name']
