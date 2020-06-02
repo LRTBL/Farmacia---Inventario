@@ -1,5 +1,96 @@
 {% extends "base-template.html" %} 
 {% block content%}
-<h1>Usuario</h1>
+<div class="container">
+    <table class="table">
+        <thead>
+            <th scope="col">ID_User</th>
+            <th scope="col">Usuario</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">Tipo</th>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user[0] }}</td>
+                    <td>{{ user[1] }}</td>
+                    <td>{{ user[3] }}</td>
+                    <td>{{ user[4] }}</td>
+                    <td>{{ user[5] }}</td>
+                    <td>
+                        <a href="{{ url_for('delete', user_id=user[0], type='user') }}">
+                            <button name="button" type="button" class="btn btn-danger" value= "delete" >eliminar</button><br>
+                        </a>
+                    </td>
+                    <td>
+                        <button name="button" type="button" class="btn btn-success" value= "edit" data-toggle="modal" data-target="#edit_{{ user[0] }}" >editar</button><br>
+                        <div id="edit_{{ user[0] }}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="trans_message" aria-hidden="true">
+                            <form action="{{ url_for('edit', type='user') }}" method="post" class="base_form">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-body"><input name="username" placeholder="{{ user[1] }}" disabled></div>
+                                    <div class="modal-body"><input name="new_password" placeholder="nueva contraseña" type="password"></div>
+                                    <div class="modal-body"><input name="name" placeholder="{{ user[3] }}"></div>
+                                    <div class="modal-body"><input name="lastname" placeholder="{{ user[4] }}"></div>
+                                    <div class="modal-body"><input name="tipe" list="tipes" placeholder="{{ user[5] }}"></div>
+
+                                    <div class="modal-footer">
+                                        <input name="user_id" value="{{ user[0] }}" hidden aria-hidden="true">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                    </div>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            <!-- Inserting data -->
+            <tr>
+                <form action = "{{ url_for('user') }}" method = "POST">
+                    <td></td>
+                    <td>
+                        <input name = "name" placeholder="Nombres" required autofocus>
+                    </td>
+                    <td>
+                        <input name = "lastname" placeholder="Apellidos" required>
+                    </td>
+                    <td>
+                        <input name = "username" placeholder="Nombre de Usuario" required>
+                    </td>
+                    <td>
+                        <input name = "password" placeholder="Contraseña" type="password" required>
+                    </td>
+                    <td>
+                        <input name = "tipe" list="tipes" placeholder="Tipo" required>
+                        <datalist id="tipes">                          
+                            <option value="Admin"></option>
+                            <option value="Empleado"></option>
+                        </datalist>
+                    </td>                   
+                    <td>
+                        <input type= "submit" class="btn btn-info btn-group-toggle" value= "enviar" /><br>
+                    </td>
+                </form>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    let close = document.getElementsByClassName("btn btn-default");
+    for(let i=0; i<close.length; i++){
+        close[i].onclick = function () {
+            let clear_fields = document.getElementsByClassName("base_form");
+            for(let i=0;i<clear_fields.length;i++){
+                clear_fields[i].reset();
+            }
+            let all = document.getElementsByClassName("btn btn-primary");
+            for(let i=0;i<all.length;i++){
+                all[i].disabled = false;
+            }
+        }
+    }
+</script>
 
 {% endblock%}

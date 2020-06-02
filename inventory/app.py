@@ -87,12 +87,12 @@ def index():
             session["username"] = username
             return redirect(url_for("home"))
 
-    return render("index.html", title="Sign Up")
+    return render("index.html", title="Login")
 
 @app.route("/logout")
 def logOut():
     session.pop("username", None)
-    return render("index.html", title="Sign Up")
+    return render("index.html", title="Login")
 
 
 @app.route('/home')
@@ -119,8 +119,46 @@ def home():
     return render('home.html', link=link, title="Resumen", warehouses=warehouse, products=products, database=q_data)
 
 @app.route("/user")
-def users():
-    return render("user.html", link=link, title="User management",)
+def user():
+    init_database()
+    msg = None
+    db = sqlite3.connect(DATABASE_NAME)
+    cursor = db.cursor()
+
+    cursor.execute("SELECT * FROM user")
+    users = cursor.fetchall()
+
+    if request.method == 'POST':
+        user_name = request.form['use_name']
+        password = request.form['password']
+        names = request.form['names']
+        last_name = request.form['last_name']
+        tipe = request.form['tipe']        
+
+        transaction_allowed = False
+        if user_name not in ['', ' ', None]:
+            if password not in ['', ' ', None]:
+                if names not in ['', ' ', None]:
+                    if last_name not in ['', ' ', None]:
+                        if tipe not in ['', ' ', None]:
+                            transaction_allowed = True
+
+        if transaction_allowed:
+            try:
+                cursor.execute("INSERT INTO user (nombreUsuario, contraseña, nombres, apellidos, tipo) VALUES (?, ?, ?, ?, ?)", 
+                (user_name, password, names, last_name, tipe))
+                db.commit()
+            except sqlite3.Error as e:
+                msg = f"An error occurred: {e.args[0]}"
+            else:
+                msg = f"{user_name} added successfully"
+
+            if msg:
+                print(msg)
+
+            return redirect(url_for('user'))
+
+    return render("user.html", link=link, users=users, transaction_message=msg, title="User management",)
 
 
 @app.route('/product', methods=['POST', 'GET'])
@@ -386,6 +424,13 @@ def delete():
         db.commit()
 
         return redirect(url_for('product'))
+    
+    elif type_ == 'user':
+        id_ = request.args.get('user_id')
+        cursor.execute("DELETE FROM user WHERE nombreUsuario == ?", str(id_))
+        db.commit()
+
+        return redirect(url_for('user'))
 
 
 @app.route('/edit', methods=['POST', 'GET'])
@@ -417,8 +462,28 @@ def edit():
             cursor.execute("UPDATE products SET prod_quantity = ?, unallocated_quantity =  unallocated_quantity + ? - ?"
                            "WHERE prod_id == ?", (prod_quantity, prod_quantity, old_prod_quantity, str(prod_id)))
         db.commit()
-
+        
         return redirect(url_for('product'))
+
+    elif type_ == 'user' and request.method == 'POST':
+        user_id = request.form['user_id']
+        new_password = request.form['new_password']
+        name = request.form['name']
+        last_name = request.form['lastname']
+        tipe = request.form['tipe']
+        
+        if new_password:
+            cursor.execute("UPDATE user SET contraseña = ? WHERE idUsuario == ?", (new_password, str(user_id)))
+        if name:
+            cursor.execute("UPDATE user SET nombres = ? WHERE idUsuario == ?", (name, str(user_id)))
+        if last_name:
+            cursor.execute("UPDATE user SET apellidos = ? WHERE idUsuario == ?", (last_name, str(user_id)))
+        if tipe:
+            cursor.execute("UPDATE user SET tipo = ? WHERE idUsuario == ?", (tipe, str(user_id)))
+        
+        db.commit()
+
+        return redirect(url_for('user'))
 
     return render(url_for(type_))
 
