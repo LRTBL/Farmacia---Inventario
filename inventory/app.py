@@ -9,8 +9,8 @@ DATABASE_NAME = 'inventory.sqlite'
 
 app = Flask(__name__)
 app.config.from_mapping(
-    SECRET_KEY='dev',
-    DATABASE=os.path.join(app.instance_path, 'database', DATABASE_NAME),
+    SECRET_KEY = os.urandom(12),
+    DATABASE = os.path.join(app.instance_path, 'database', DATABASE_NAME),
 )
 
 link = {x: x for x in ["home", "user", "location", "product", "movement"]}
@@ -71,28 +71,35 @@ def init_database():
 
 
 @app.route("/" , methods=['GET','POST'])
-def index():
+def index():    
+    msg = ""
     init_database()
     db = sqlite3.connect(DATABASE_NAME)
     cursor = db.cursor()
 
     if request.method == 'POST':
-        session.pop('username', None)
+        #session.pop('username', None)
         username = str(request.form["user"])
         password = str(request.form["password"])
+        print(username, password)
         
         cursor.execute("SELECT * from user where nombreUsuario = ? and contraseña = ?", (username, password))
         data = cursor.fetchall()
         if len(data) == 1:
-            session["username"] = username
-            return redirect(url_for("home"))
+            session['logged_in'] = True
+        else:        
+            msg = "Wrong Credentials"
 
-    return render("index.html", title="Login")
+    if not session.get('logged_in'):
+        return render("index.html", title="Login", msg=msg)
+    else:
+        return redirect(url_for("home"))
 
 @app.route("/logout")
 def logOut():
-    session.pop("username", None)
-    return render("index.html", title="Login")
+    session['logged_in'] = False
+    return index()
+    #return render("index.html", title="Login")
 
 
 @app.route('/home')
