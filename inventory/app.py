@@ -41,7 +41,7 @@ def init_database():
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user (idUsuario INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    nombreUsuario VARCHAR(12) NOT NULL,
+                                    nombreUsuario VARCHAR(12) UNIQUE NOT NULL,
                                     contraseña VARCHAR(10) DEFAULT NULL,
                                     nombres VARCHAR(25) DEFAULT NULL,
                                     apellidos VARCHAR(25) DEFAULT NULL,
@@ -125,7 +125,13 @@ def home():
 
     return render('home.html', link=link, title="Resumen", warehouses=warehouse, products=products, database=q_data)
 
-@app.route("/user")
+def clear(*arg):
+    for a in arg:
+        if a in ['', ' ', None]:
+            return False
+    return True
+
+@app.route("/user", methods=['GET','POST'])
 def user():
     init_database()
     msg = None
@@ -143,6 +149,8 @@ def user():
         tipe = request.form['tipe']        
 
         transaction_allowed = False
+        print (clear([user_name, password, names, last_name, tipe]))
+
         if user_name not in ['', ' ', None]:
             if password not in ['', ' ', None]:
                 if names not in ['', ' ', None]:
@@ -212,7 +220,7 @@ def location():
     cursor = db.cursor()
 
     cursor.execute("SELECT * FROM location")
-    warehouse_data = cursor.fetchall()
+    warehouse_data = cursor.fetchall()    
 
     if request.method == 'POST':
         warehouse_name = request.form['warehouse_name']
@@ -247,6 +255,10 @@ def movement():
 
     cursor.execute("SELECT * FROM logistics")
     logistics_data = cursor.fetchall()
+
+    cursor.execute("SELECT DISTINCT DATE(trans_time) FROM logistics;")
+    days = cursor.fetchall()
+    print(days)
 
     # add suggestive content for page
     cursor.execute("SELECT prod_id, prod_name, unallocated_quantity FROM products")
@@ -383,7 +395,7 @@ def movement():
             return redirect(url_for('movement'))
 
     return render('movement.html', title="Movimientos de Productos", link=link, trans_message=msg,
-                  products=products, locations=locations, allocated=alloc_json,
+                  products=products, locations=locations, days=days, allocated=alloc_json,
                   logs=logistics_data, database=log_summary)
 
 
@@ -494,6 +506,9 @@ def edit():
 
     return render(url_for(type_))
 
+@app.route('/generate', methods=['POST', 'GET'])
+def generate():
+    return movement()
 
 if __name__ == '__main__':
     app.run(port = 3000 , debug = True)

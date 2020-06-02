@@ -5,7 +5,7 @@
         <div style="height: 50%;width: 100%; float: left">
             {% if warehouses == None or warehouses|length == 0 %}
             <div style="float: left;width:50%;">
-                <h3 align="center" class="font-weight-light">Sin almacenes registrados aun.</h3>
+                <h3 align="center" class="font-weight-light"><b>Sin almacenes registrados aun.</b></h3>
             </div>
             {% else %}
             <!-- Div to list all warehouses -->
@@ -59,18 +59,18 @@
     </div>
 
     <div class="container" style="float: contour;" align="center">
-    <h3 align="center">Resumen</h3>
+    <h3 align="center"><b>Resumen de Productos</b></h3>
         <div class="form-horizontal" title="Summary">
         {% if database == None or database|length == 0 %}
-            <h3 align="center" class="font-weight-light">Resumen de productos no disponible</h3>
+            <h3 align="center" class="font-weight-light"><b>Resumen de productos no disponible</b></h3>
         {% else %}
             <!-- Summary needed -->
             <div>
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">Producto</th>
-                            <th scope="col">Sin Aginar</th>
+                            <th scope="col">Nombre Producto</th>
+                            <th scope="col">Cantidad sin asignar</th>
                             <th scope="col">Total</th>
                         </tr>
                     </thead>

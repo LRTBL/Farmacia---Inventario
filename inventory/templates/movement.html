@@ -70,6 +70,18 @@
         {% if logs == None or logs|length == 0 %}
             <h3 align="center" class="font-weight-light">Sin datos aún</h3>
         {% else %}
+            <div class="d-flex justify-content-center">
+                <input name="day" id="day" list="days" placeholder="Seleccione el dia" class="form-control" autocomplete="off" required>
+                <datalist id="days">
+                    {% for day in days %}
+                        <option value="{{ day[0] }}" id="day_{{ day[0] }}">
+                    {% endfor %}
+                </datalist>
+                <a href="{{ url_for('generate') }}">
+                    <button name="button" type="button" class="btn btn-danger" value= "delete" >Generar Reporte</button><br>
+                </a>
+            </div>
+            
             <table class="table">
                 <thead>
                     <tr>
