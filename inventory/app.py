@@ -36,7 +36,6 @@ def init_database():
                     BEGIN 
                         UPDATE products SET unallocated_quantity  = NEW.prod_quantity WHERE rowid = NEW.rowid;
                     END;
-
     """)
 
     cursor.execute("""
