@@ -164,7 +164,10 @@
         };
 
         fech.onchange = function (){
-            document.getElementById("link").setAttribute('href', 'movement?type=generate&fech='+this.value);
+            document.getElementById("link")
+            .setAttribute('href', 'movement?type=generate&fech='+this.value)
+            document.getElementById("link")
+            .setAttribute('target', '_blank');
             
         }
         //works fine DON'T TOUCH it lol

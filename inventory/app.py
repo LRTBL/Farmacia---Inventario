@@ -87,6 +87,8 @@ def index():
         data = cursor.fetchall()
         if len(data) == 1:
             session['logged_in'] = True
+            session['user'] = username
+            session['pass'] = password
         else:        
             msg = "Wrong Credentials"
 
@@ -262,19 +264,12 @@ def movement():
     cursor.execute("SELECT DISTINCT DATE(trans_time) FROM logistics;")
     days = cursor.fetchall()
     
-
-    cursor.execute("""
-    SELECT trans_id, prod_name, loc_name, lc.prod_quantity, trans_time
-                      from logistics as lc
-                      inner join products on lc.prod_id = products.prod_id
-                      inner join location on lc.to_loc_id = location.loc_id                      
-    """)
-    t1 = cursor.fetchall()
-    cursor.execute("SELECT from_loc_id from logistics ")
+    cursor.execute("SELECT nombres, apellidos from user WHERE nombreUsuario = ?", (session['user'],))
     t2 = cursor.fetchall()
-
-    #print(t1)
-    #print(t2[0][0])
+    gen_nombre = t2[0][0]
+    gen_apelli = t2[0][1]
+    print(gen_nombre)
+    print(gen_apelli)
 
     cursor.execute("SELECT prod_id, prod_name, unallocated_quantity FROM products")
     products = cursor.fetchall()
