@@ -268,8 +268,7 @@ def movement():
     t2 = cursor.fetchall()
     gen_nombre = t2[0][0]
     gen_apelli = t2[0][1]
-    print(gen_nombre)
-    print(gen_apelli)
+    
 
     cursor.execute("SELECT prod_id, prod_name, unallocated_quantity FROM products")
     products = cursor.fetchall()
@@ -412,6 +411,8 @@ def movement():
     if request.method == 'GET' and type_ =='generate': 
         fech_ = request.args.get('fech')
         print (fech_)
+        print(gen_nombre)
+        print(gen_apelli)
 
     return render('movement.html', title="Movimientos de Productos", link=link, trans_message=msg,
                   products=products, locations=locations, days=days, allocated=alloc_json,
