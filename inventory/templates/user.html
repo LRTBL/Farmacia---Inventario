@@ -3,10 +3,9 @@
 <div class="container">
     <table class="table">
         <thead>
-            <th scope="col">ID_User</th>
+            <th scope="col">ID</th>
             <th scope="col">Usuario</th>
-            <th scope="col">Nombre</th>
-            <th scope="col">Apellido</th>
+            <th scope="col">Nombre</th>            
             <th scope="col">Tipo</th>
         </thead>
         <tbody>
@@ -15,8 +14,12 @@
                     <td>{{ user[0] }}</td>
                     <td>{{ user[1] }}</td>
                     <td>{{ user[3] }}</td>
-                    <td>{{ user[4] }}</td>                   
-                    <td>{{ tip }}</td>
+                                   
+                    {% if user[5]=='A' %}
+                    <td>Admin</td>
+                    {% elif user[5]=='E' %}
+                    <td>Empleado</td>
+                    {% endif %}                    
                     
                     <td>
                         <a href="{{ url_for('delete', user_id=user[0], type='user') }}">
@@ -47,36 +50,37 @@
                     </td>
                 </tr>
             {% endfor %}
-            <!-- Inserting data -->
-            <tr>
-                <form action = "{{ url_for('user') }}" method = "POST">
-                    <td></td>
-                    <td>
-                        <input name = "name" placeholder="Nombres" required autofocus>
-                    </td>
-                    <td>
-                        <input name = "lastname" placeholder="Apellidos" required>
-                    </td>
-                    <td>
-                        <input name = "username" placeholder="Nombre de Usuario" required>
-                    </td>
-                    <td>
-                        <input name = "password" placeholder="Contraseña" type="password" required>
-                    </td>
-                    <td>
-                        <input name = "tipe" list="tipes" placeholder="Tipo" required>
-                        <datalist id="tipes">                          
-                            <option value="Admin"></option>
-                            <option value="Empleado"></option>
-                        </datalist>
-                    </td>                   
-                    <td>
-                        <input type= "submit" class="btn btn-info btn-group-toggle" value= "enviar" /><br>
-                    </td>
-                </form>
-            </tr>
+            <!-- Inserting data -->         
+                
+            
         </tbody>
     </table>
+
+    <form action = "{{ url_for('user') }}" method = "POST">
+        <td></td>
+        <td>
+            <input name = "name" placeholder="Nombres" required autofocus>
+        </td>
+        <td>
+            <input name = "lastname" placeholder="Apellidos" required>
+        </td>
+        <td>
+            <input name = "username" placeholder="Nombre de Usuario" required>
+        </td>
+        <td>
+            <input name = "password" placeholder="Contraseña" type="password" required>
+        </td>
+        <td>
+            <input name = "tipe" list="tipes" placeholder="Tipo" required>
+            <datalist id="tipes">                          
+                <option value="Admin"></option>
+                <option value="Empleado"></option>
+            </datalist>
+        </td>                   
+        <td>
+            <input type= "submit" class="btn btn-info btn-group-toggle" value= "enviar" /><br>
+        </td>
+    </form>
 </div>
 <script>
     let close = document.getElementsByClassName("btn btn-default");

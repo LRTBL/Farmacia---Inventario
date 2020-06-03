@@ -35,18 +35,26 @@
         <form action = "{{ url_for('movement') }}" method = "POST">
             <div class="form-row" title="Add logs">
                 <div class="col">
-                    <input name= "prod_name" id="prod_name" list="products" placeholder="Nombre de Producto" class="form-control" autocomplete="off" required autofocus>
-                    <datalist id="products">
+                    <select name= "prod_name" id="prod_name" placeholder="Nombre de Producto" class="form-control" autocomplete="off" required autofocus>
+                        <option></option>
                         {% for product in products %}
-                            <option value="{{ product[1] }}" id="prod_{{ product[0] }}">
+                            <option value="{{ product[1] }}" id="prod_{{ product[0] }}">{{ product[1] }}</option>
                         {% endfor %}
-                    </datalist>
+                    </select>
+
                 </div>
                 <div class="col">
-                    <input name="from_loc" id="from_loc" list="locations_to_from" placeholder="Almacen Origen" class="form-control" autocomplete="off">
+                    <select name="from_loc" id="from_loc" placeholder="Origen" class="form-control" autocomplete="off" disabled>
+                        
+                        {% for location in locations %}
+                        <option value="{{ location[1] }}" id="loc_{{ location[0] }}">{{ location[1] }}</option>
+                        {% endfor %}
+                    </select>                    
                 </div>
                 <div class="col">
-                    <input name="to_loc" id="to_loc" list="locations_to_from" placeholder="Almacen Destino" class="form-control" autocomplete="off">
+                    <select name="to_loc" id="to_loc" placeholder="Destino" class="form-control" autocomplete="off" disabled>
+                        
+                    </select>
                 </div>
                 <div class="col slide-container">
                     <!--input name="quantity" placeholder="Quantity" class="form-control" autocomplete="off" required-->
@@ -54,7 +62,7 @@
                     <p>Valor: <span id="show_selected"></span>&nbsp;&nbsp;&nbsp;<span id="max_limit" class="font-weight-light"></span></p>
                 </div>
                 <div class="col">
-                    <input type= "submit" id="submit" class="btn btn-info btn-group-toggle" value= "enviar" /><br>
+                    <input type= "submit" id="submit" class="btn btn-info btn-group-toggle" value= "enviar" disabled/><br>
                 </div>
                 <datalist id="locations_to_from">
                     {% for location in locations %}
@@ -71,12 +79,12 @@
             <h3 align="center" class="font-weight-light">Sin datos aún</h3>
         {% else %}
             <div class="d-flex justify-content-center">
-                <input name="day" id="day" list="days" placeholder="Seleccione el dia" class="form-control" autocomplete="off" required>
-                <datalist id="days">
+                <select name="day" id="day" list="days" placeholder="Seleccione el dia" class="form-control" autocomplete="off" required>
                     {% for day in days %}
-                        <option value="{{ day[0] }}" id="day_{{ day[0] }}">
+                        <option value="{{ day[0] }}" id="day_{{ day[0] }}">{{ day[0] }}</option>
                     {% endfor %}
-                </datalist>
+                </select>
+                
                 <a href="{{ url_for('generate') }}">
                     <button name="button" type="button" class="btn btn-danger" value= "delete" >Generar Reporte</button><br>
                 </a>
@@ -85,12 +93,13 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">ID_Transacción</th>
+                        <th scope="col">ID</th>
                         <th scope="col">ID_Producto</th>
                         <th scope="col">Origen</th>
                         <th scope="col">Destino</th>
                         <th scope="col">Cantidad</th>
-                        <th scope="col">Marca de Tiempo</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Fecha y hora</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -101,7 +110,14 @@
                             <td>{{ log[2] }}</td>
                             <td>{{ log[3] }}</td>
                             <td>{{ log[4] }}</td>
-                            <td>{{ log[5] }}</td>
+
+                            {% if log[5]=='C' %}
+                            <td>Compra</td>  
+                            {% else %}
+                            <td>Transferencia</td>  
+                            {% endif %}
+                                                      
+                            <td>{{ log[6] }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -117,6 +133,15 @@
             products["{{ product[1] }}"] = "{{ product[2] }}";
         {% endfor %}
 
+        const locations = [];
+
+        {% for location in locations %} 
+            {% if location[2]!=1 %}
+                locations["{{ location[0]-2 }}"] = "{{ location[1] }}";
+            {% endif %}
+        {% endfor %}
+        console.log(locations);
+
         // this contains all allocated products in form --> product: location: quantity
         let summary = JSON.parse({{ allocated|tojson }});
         console.log(summary);
@@ -129,6 +154,13 @@
         let to_loc = document.getElementById("to_loc");
         let from_loc = document.getElementById("from_loc");
 
+        let send = document.getElementById("submit");
+
+        prod_name.onchange = function() {
+            from_loc.disabled = false;
+            from_loc.value = "";
+        };
+
         //works fine DON'T TOUCH it lol
         to_loc.onchange = function() {
             let max_val;
@@ -139,12 +171,12 @@
                 //console.log('to_loc --> from_loc was null ', max_val)
 
                 if(max_val === 0){
-                    document.getElementById("submit").disabled = true;
+                    send.disabled = true;
                 }else{
-                    document.getElementById("submit").disabled = false;
+                    send.disabled = false;
                 }
             }
-
+            
             output.innerHTML = slider.value;
         };
 
@@ -157,12 +189,30 @@
             //console.log('from_loc --> to location updated ', max_val);
 
             if(max_val === 0){
-                document.getElementById("submit").disabled = true;
+                send.disabled = true;
             }else{
-                document.getElementById("submit").disabled = false;
+                send.disabled = false;
             }
-
+            
+            to_loc.disabled = false;
+            to_loc.value = "";
             output.innerHTML = slider.value;
+            
+            var length = from_loc.options.length;
+            for (i = length-1; i >= 0; i--) {
+                to_loc.options[i] = null;
+            }            
+            let selected = from_loc.value;
+
+            for (i = 0; i <=length-2; i++) {
+                let current = locations[i]; 
+                if (current !=selected){
+                    let newOption = new Option(current,current);
+                    to_loc.appendChild(newOption);
+                }
+            }
+            
+            console.log(selected);
         };
 
         output.innerHTML = slider.value;
@@ -172,13 +222,21 @@
             let curr_val = parseInt(this.value);
             let max_val = parseInt(summary[(prod_name.value).toString()][(from_loc.value).toString()].toString());
 
-            if(curr_val > max_val){
-                document.getElementById("submit").disabled = true;
+            if(curr_val === 0){
+                send.disabled = true;
+            }else if(curr_val > max_val){
+                send.disabled = true;
             }else{
-                document.getElementById("submit").disabled = false;
+                send.disabled = false;
             }
-
         };
+
+        /*send.onclick = function() {            
+            to_loc.disabled = true;
+            send.disabled = true;
+            from_loc.value = '-';
+            to_loc.value = '-';
+        }*/
 
     </script>
 {% endblock %}

@@ -51,7 +51,8 @@ def init_database():
     # initialize page content
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS location(loc_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                 loc_name TEXT UNIQUE NOT NULL);
+                                 loc_name TEXT UNIQUE NOT NULL,
+                                 main BOOLEAN DEFAULT 0);
     """)
 
     # initialize page content
@@ -61,6 +62,7 @@ def init_database():
                                 from_loc_id INTEGER NULL,
                                 to_loc_id INTEGER NULL,
                                 prod_quantity INTEGER NOT NULL,
+                                tipo CHAR(1) NOT NULL,
                                 trans_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                 FOREIGN KEY(prod_id) REFERENCES products(prod_id),
                                 FOREIGN KEY(from_loc_id) REFERENCES location(loc_id),
@@ -125,12 +127,6 @@ def home():
 
     return render('home.html', link=link, title="Resumen", warehouses=warehouse, products=products, database=q_data)
 
-def clear(*arg):
-    for a in arg:
-        if a in ['', ' ', None]:
-            return False
-    return True
-
 @app.route("/user", methods=['GET','POST'])
 def user():
     init_database()
@@ -142,15 +138,21 @@ def user():
     users = cursor.fetchall()
 
     if request.method == 'POST':
-        user_name = request.form['user_name']
+        user_name = request.form['username']
         password = request.form['password']
-        names = request.form['names']
-        last_name = request.form['last_name']
+        names = request.form['name']
+        last_name = request.form['lastname']
         tipe = request.form['tipe']        
 
+        arg = [user_name, password, names, last_name, tipe]
+        for a in arg:
+            if a in ['', ' ', None]:
+                transaction_allowed = False
+                break
+            else:
+                print(True)
+        
         transaction_allowed = False
-        print (clear([user_name, password, names, last_name, tipe]))
-
         if user_name not in ['', ' ', None]:
             if password not in ['', ' ', None]:
                 if names not in ['', ' ', None]:
@@ -198,6 +200,9 @@ def product():
         if transaction_allowed:
             try:
                 cursor.execute("INSERT INTO products (prod_name, prod_quantity) VALUES (?, ?)", (prod_name, quantity))
+                cursor.execute("SELECT prod_id FROM products WHERE prod_name = ?", (prod_name,))
+                prod_id = cursor.fetchone()                
+                cursor.execute("INSERT INTO logistics (prod_id, to_loc_id, prod_quantity, tipo) VALUES (?, ?, ?, ?)", (int(prod_id[0]), 1, quantity, 'C'))
                 db.commit()
             except sqlite3.Error as e:
                 msg = f"An error occurred: {e.args[0]}"
@@ -258,13 +263,25 @@ def movement():
 
     cursor.execute("SELECT DISTINCT DATE(trans_time) FROM logistics;")
     days = cursor.fetchall()
-    print(days)
+    
 
-    # add suggestive content for page
+    cursor.execute("""SELECT trans_id, prod_name, loc_name, lc.prod_quantity, trans_time
+                      from logistics as lc
+                      inner join products on lc.prod_id = products.prod_id
+                      inner join location on lc.from_loc_id = location.loc_id
+                      UNION
+                      SELECT trans_id, prod_name, loc_name, lc.prod_quantity, trans_time
+                      from logistics as lc
+                      inner join products on lc.prod_id = products.prod_id
+                      inner join location on lc.to_loc_id = location.loc_id
+                    """)
+    transaction = cursor.fetchall()
+    #print(transaction)
+
     cursor.execute("SELECT prod_id, prod_name, unallocated_quantity FROM products")
     products = cursor.fetchall()
 
-    cursor.execute("SELECT loc_id, loc_name FROM location")
+    cursor.execute("SELECT loc_id, loc_name, main FROM location")
     locations = cursor.fetchall()
 
     log_summary = []
@@ -296,11 +313,8 @@ def movement():
                 sum_to_loc = (0,)
 
             log_summary += [(temp_prod_name + temp_loc_name + (sum_to_loc[0] - sum_from_loc[0],))]
-
-    # CHECK if reductions are calculated as well!
-    # summary data --> in format:
-    # {'Asus Zenfone 2': {'Mahalakshmi': 50, 'Gorhe': 50},
-    # 'Prada watch': {'Malad': 50, 'Mahalakshmi': 115}, 'Apple iPhone': {'Airoli': 75}}
+            print (log_summary)
+    
     alloc_json = {}
     for row in log_summary:
         try:
@@ -312,6 +326,7 @@ def movement():
             alloc_json[row[0]] = {}
             alloc_json[row[0]][row[1]] = row[2]
     alloc_json = json.dumps(alloc_json)
+    print (alloc_json)
 
     if request.method == 'POST':
         # transaction times are stored in UTC
@@ -319,7 +334,7 @@ def movement():
         from_loc = request.form['from_loc']
         to_loc = request.form['to_loc']
         quantity = request.form['quantity']
-
+        
         # if no 'from loc' is given, that means the product is being shipped to a warehouse (init condition)
         if from_loc in [None, '', ' ']:
             try:
@@ -379,9 +394,15 @@ def movement():
                 prod_id = ''.join([str(x[0]) for x in cursor.fetchall()])
 
                 cursor.execute("""
-                INSERT INTO logistics (prod_id, from_loc_id, to_loc_id, prod_quantity)
-                VALUES (?, ?, ?, ?)
-                """, (prod_id, from_loc, to_loc, quantity))
+                INSERT INTO logistics (prod_id, from_loc_id, to_loc_id, prod_quantity, tipo)
+                VALUES (?, ?, ?, ?, ?)
+                """, (prod_id, from_loc, to_loc, quantity, 'T'))
+
+                cursor.execute("""
+                UPDATE products 
+                SET unallocated_quantity = unallocated_quantity - ? 
+                WHERE prod_name == ?
+                """, (quantity, prod_name))
                 db.commit()
 
             except sqlite3.Error as e:
@@ -446,7 +467,7 @@ def delete():
     
     elif type_ == 'user':
         id_ = request.args.get('user_id')
-        cursor.execute("DELETE FROM user WHERE nombreUsuario == ?", str(id_))
+        cursor.execute("DELETE FROM user WHERE idUsuario == ?", str(id_))
         db.commit()
 
         return redirect(url_for('user'))
@@ -508,6 +529,7 @@ def edit():
 
 @app.route('/generate', methods=['POST', 'GET'])
 def generate():
+
     return movement()
 
 if __name__ == '__main__':

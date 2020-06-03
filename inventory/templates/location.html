@@ -3,8 +3,8 @@
     <div class="container">
         <table class="table">
             <thead>
-                <th scope="col">ID_Almacen</th>
-                <th scope="col">Nombre de Almacen</th>
+                <th scope="col">ID</th>
+                <th scope="col">Ubicacion del Almacen</th>
                 <th></th>
             </thead>
             <tbody>
@@ -12,6 +12,8 @@
                     <tr>
                         <td>{{ location[0] }}</td>
                         <td>{{ location[1] }}</td>
+
+                        {% if location[2]==0 %}
                         <td>
                             <a href="{{ url_for('delete', loc_id=location[0], type='location') }}">
                                 <button name="button" type="button" class="btn btn-danger" value= "delete" >eliminar</button><br>
@@ -34,6 +36,9 @@
                                 </form>
                             </div>
                         </td>
+                        {% else %}
+                        <td><i>Primario/No eliminar</i></td>
+                        {% endif %} 
                     </tr>
                 {% endfor %}
                 <!-- Inserting data -->
