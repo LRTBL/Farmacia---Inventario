@@ -9,7 +9,7 @@ DATABASE_NAME = 'inventory.sqlite'
 
 app = Flask(__name__)
 app.config.from_mapping(
-    SECRET_KEY = os.urandom(12),
+    SECRET_KEY = 'dev',
     DATABASE = os.path.join(app.instance_path, 'database', DATABASE_NAME),
 )
 
@@ -69,7 +69,6 @@ def init_database():
     """)
 
     db.commit()
-
 
 @app.route("/" , methods=['GET','POST'])
 def index():    
@@ -510,7 +509,7 @@ def edit():
         name = request.form['name']
         last_name = request.form['lastname']
         tipe = request.form['tipe']
-        
+        print(tipe)
         if new_password:
             cursor.execute("UPDATE user SET contraseña = ? WHERE idUsuario == ?", (new_password, str(user_id)))
         if name:

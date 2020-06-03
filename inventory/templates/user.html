@@ -36,7 +36,12 @@
                                     <div class="modal-body"><input name="new_password" placeholder="nueva contraseña" type="password"></div>
                                     <div class="modal-body"><input name="name" placeholder="{{ user[3] }}"></div>
                                     <div class="modal-body"><input name="lastname" placeholder="{{ user[4] }}"></div>
-                                    <div class="modal-body"><input name="tipe" list="tipes" placeholder="{{ user[5] }}"></div>
+                                    <div class="modal-body">
+                                        <select name="tipe" placeholder="{{ user[5] }}">
+                                            <option value="A">Admin</option>
+                                            <option value="E">Empleado</option>
+                                        </select>
+                                    </div>
 
                                     <div class="modal-footer">
                                         <input name="user_id" value="{{ user[0] }}" hidden aria-hidden="true">
@@ -71,11 +76,10 @@
             <input name = "password" placeholder="Contraseña" type="password" required>
         </td>
         <td>
-            <input name = "tipe" list="tipes" placeholder="Tipo" required>
-            <datalist id="tipes">                          
-                <option value="Admin"></option>
-                <option value="Empleado"></option>
-            </datalist>
+            <select name = "tipe" list="tipes" placeholder="Tipo" required>
+                <option value="A">Admin</option>
+                <option value="E">Empleado</option>
+            </select>
         </td>                   
         <td>
             <input type= "submit" class="btn btn-info btn-group-toggle" value= "enviar" /><br>
