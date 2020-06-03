@@ -69,7 +69,7 @@
                         <option value="{{ location[1] }}" id="loc_{{ location[0] }}">
                     {% endfor %}
                 </datalist>
-            </div>
+            </div>            
         </form>
 
         <br><hr><br>
@@ -80,12 +80,13 @@
         {% else %}
             <div class="d-flex justify-content-center">
                 <select name="day" id="day" list="days" placeholder="Seleccione el dia" class="form-control" autocomplete="off" required>
+                    <option></option>
                     {% for day in days %}
                         <option value="{{ day[0] }}" id="day_{{ day[0] }}">{{ day[0] }}</option>
                     {% endfor %}
                 </select>
                 
-                <a href="{{ url_for('generate') }}">
+                <a href="" id='link'>
                     <button name="button" type="button" class="btn btn-danger" value= "delete" >Generar Reporte</button><br>
                 </a>
             </div>
@@ -155,12 +156,17 @@
         let from_loc = document.getElementById("from_loc");
 
         let send = document.getElementById("submit");
-
+        let fech = document.getElementById("day");
+        
         prod_name.onchange = function() {
             from_loc.disabled = false;
             from_loc.value = "";
         };
 
+        fech.onchange = function (){
+            document.getElementById("link").setAttribute('href', 'movement?type=generate&fech='+this.value);
+            
+        }
         //works fine DON'T TOUCH it lol
         to_loc.onchange = function() {
             let max_val;

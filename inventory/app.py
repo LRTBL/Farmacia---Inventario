@@ -263,18 +263,18 @@ def movement():
     days = cursor.fetchall()
     
 
-    cursor.execute("""SELECT trans_id, prod_name, loc_name, lc.prod_quantity, trans_time
+    cursor.execute("""
+    SELECT trans_id, prod_name, loc_name, lc.prod_quantity, trans_time
                       from logistics as lc
                       inner join products on lc.prod_id = products.prod_id
-                      inner join location on lc.from_loc_id = location.loc_id
-                      UNION
-                      SELECT trans_id, prod_name, loc_name, lc.prod_quantity, trans_time
-                      from logistics as lc
-                      inner join products on lc.prod_id = products.prod_id
-                      inner join location on lc.to_loc_id = location.loc_id
-                    """)
-    transaction = cursor.fetchall()
-    #print(transaction)
+                      inner join location on lc.to_loc_id = location.loc_id                      
+    """)
+    t1 = cursor.fetchall()
+    cursor.execute("SELECT from_loc_id from logistics ")
+    t2 = cursor.fetchall()
+
+    #print(t1)
+    #print(t2[0][0])
 
     cursor.execute("SELECT prod_id, prod_name, unallocated_quantity FROM products")
     products = cursor.fetchall()
@@ -311,7 +311,7 @@ def movement():
                 sum_to_loc = (0,)
 
             log_summary += [(temp_prod_name + temp_loc_name + (sum_to_loc[0] - sum_from_loc[0],))]
-            print (log_summary)
+            
     
     alloc_json = {}
     for row in log_summary:
@@ -324,7 +324,7 @@ def movement():
             alloc_json[row[0]] = {}
             alloc_json[row[0]][row[1]] = row[2]
     alloc_json = json.dumps(alloc_json)
-    print (alloc_json)
+
 
     if request.method == 'POST':
         # transaction times are stored in UTC
@@ -407,11 +407,16 @@ def movement():
                 msg = f"An error occurred: {e.args[0]}"
             else:
                 msg = "Transaction added successfully"
-
-        # print a transaction message if exists!
+    
+            # print a transaction message if exists!
         if msg:
             print(msg)
             return redirect(url_for('movement'))
+    
+    type_ = request.args.get('type')    
+    if request.method == 'GET' and type_ =='generate': 
+        fech_ = request.args.get('fech')
+        print (fech_)
 
     return render('movement.html', title="Movimientos de Productos", link=link, trans_message=msg,
                   products=products, locations=locations, days=days, allocated=alloc_json,
@@ -524,11 +529,6 @@ def edit():
         return redirect(url_for('user'))
 
     return render(url_for(type_))
-
-@app.route('/generate', methods=['POST', 'GET'])
-def generate():
-
-    return movement()
 
 if __name__ == '__main__':
     app.run(port = 3000 , debug = True)
