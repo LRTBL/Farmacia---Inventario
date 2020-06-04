@@ -1,91 +1,184 @@
-{% extends 'base-template.html' %}
-{% block content %}
+{% extends 'base-template.html' %} {% block content %}
 <style>
-    .modal-content{
-        padding: 24px 16%;
-    }
+  .modal-content {
+    padding: 24px 16%;
+  }
 </style>
 <div class="container">
-        <div class="table-wrapper">
-        <div class="table-title">
-            <div class="row">
-                <div class="col-sm-8"><h2>Sucursales <b>Detalles</b></h2></div>
-                <div class="col-sm-4">
-                    <button type="button" class="btn btn-info add-new" data-toggle="modal" data-target="#new" >
-                        <i class="fa fa-plus"></i>Añadir nuevo
-                    </button>
-                </div>
-            </div>
+  <div class="table-wrapper" style="border-radius: 1rem;">
+    <div class="table-title">
+      <div class="row">
+        <div class="col-sm-8">
+          <h2>Sucursales <b>Detalles</b></h2>
         </div>
-        <table class="table">
-            <thead>
-                <th scope="col">ID</th>
-                <th scope="col">Sucursales</th>
-                <th scope="col">Acciones</th>
-            </thead>
-            <tbody>
-                {% for location in warehouses %}
-                    <tr>
-                        <td>{{ location[0] }}</td>
-                        <td>{{ location[1] }}</td>
-
-                        {% if location[2]==0 %}                        
-                        <td>
-                            <button name="button" type="button" class="btn btn-success" value= "edit" data-toggle="modal" data-target="#edit_{{ location[0] }}" >
-                                <i class="material-icons">&#xE254;</i>
-                            </button>
-                                <div id="edit_{{ location[0] }}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="trans_message" aria-hidden="true">
-                                <form action="{{ url_for('edit', type='location') }}" method="post">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-body"><input class="form-control" name="loc_name" placeholder="{{ location[1] }}" 
-                                                onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"  maxlength="25"></div>
-                                            <div class="modal-footer">
-                                                <input name="loc_id" value="{{ location[0] }}" hidden aria-hidden="true">
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <a href="{{ url_for('delete', loc_id=location[0], type='location') }}">
-                                <button name="button" type="button" class="btn btn-danger" value= "delete" >
-                                    <i class="material-icons">&#xE872;</i>
-                                </button><br>
-                            </a>
-                        </td>
-                        
-                        {% else %}
-                        <td><i>Primario/No eliminar</i></td>
-                        {% endif %} 
-                    </tr>
-                {% endfor %}
-           
-            </tbody>
-        </table>
-
-        <div id="new" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="trans_message" aria-hidden="true">
-            <form action="{{ url_for('location') }}" method="post" class="base_form">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="col-sm-10"><h2>Añadir <b>Sucursal</b></h2></div>
-                    <div class="modal-body d-flex justify-content-center"><input name= "warehouse_name" class="form-control" placeholder="Nombre de sucursal" maxlength="20"
-                        onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"  maxlength="25" required autofocus></div>
-                    <div class="modal-body d-flex justify-content-center">
-                        <select name="prov" class="form-control" placeholder="Tipo" required hidden>
-                            <option value="A">Admin</option>
-                            <option value="E">Empleado</option>
-                        </select>    
-                    </div>
-    
-                    <div class="modal-footer">                    
-                        <button type="button" class="btn btn-default " data-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary" value= "enviar">Crear</button>
-                    </div>
-                </div>
-            </div>
-            </form>
+        <div class="col-sm-4">
+          <button
+            type="button"
+            class="btn btn-info add-new"
+            data-toggle="modal"
+            data-target="#new"
+          >
+            <i class="fa fa-plus"></i>Añadir nuevo
+          </button>
         </div>
+      </div>
     </div>
- {% endblock %}
+    <table class="table">
+      <thead>
+        <th scope="col">ID</th>
+        <th scope="col">Sucursales</th>
+        <th scope="col">Acciones</th>
+      </thead>
+      <tbody>
+        {% for location in warehouses %}
+        <tr>
+          <td>{{ location[0] }}</td>
+          <td>{{ location[1] }}</td>
+
+          {% if location[2]==0 %}
+          <td>
+            <div style="flex-direction: column;">
+              <button
+                name="button"
+                type="button"
+                style="width: 50%;"
+                class="btn btn-success"
+                value="edit"
+                data-toggle="modal"
+                data-target="#edit_{{ location[0] }}"
+              >
+                <i class="material-icons">&#xE254;</i>
+              </button>
+              <a
+                href="{{ url_for('delete', loc_id=location[0], type='location') }}"
+              >
+                <button
+                  name="button"
+                  type="button"
+                  class="btn btn-danger"
+                  value="delete"
+                  style="width: 90%; margin-right: 4rem;"
+                >
+                  <i class="material-icons">&#xE872;</i>
+                </button>
+              </a>
+            </div>
+            <div
+              id="edit_{{ location[0] }}"
+              class="modal fade"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="trans_message"
+              aria-hidden="true"
+            >
+              <form
+                action="{{ url_for('edit', type='location') }}"
+                method="post"
+              >
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-body">
+                      <input
+                        class="form-control"
+                        name="loc_name"
+                        placeholder="{{ location[1] }}"
+                        onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"
+                        maxlength="25"
+                      />
+                    </div>
+
+                    <div class="modal-footer">
+                      <input
+                        name="loc_id"
+                        value="{{ location[0] }}"
+                        hidden
+                        aria-hidden="true"
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal"
+                      >
+                        Cerrar
+                      </button>
+                      <button type="submit" class="btn btn-primary btn-block">
+                        Guardar Cambios
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </td>
+
+          {% else %}
+          <td><i>Primario/No eliminar</i></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div
+      id="new"
+      class="modal fade"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="trans_message"
+      aria-hidden="true"
+    >
+      <form action="{{ url_for('location') }}" method="post" class="base_form">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="col-sm-10">
+              <h2>Añadir <b>Sucursal</b></h2>
+            </div>
+            <div class="modal-body d-flex justify-content-center">
+              <input
+                name="warehouse_name"
+                class="form-control"
+                placeholder="Nombre de sucursal"
+                maxlength="20"
+                onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"
+                maxlength="25"
+                required
+                autofocus
+              />
+            </div>
+
+            <div class="modal-body d-flex justify-content-center">
+              <select
+                name="prov"
+                class="form-control"
+                placeholder="Tipo"
+                required
+                hidden
+              >
+                <option value="A">Admin</option>
+                <option value="E">Empleado</option>
+              </select>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Cerrar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary btn-block"
+                value="enviar"
+              >
+                Crear
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endblock %}
+</div>

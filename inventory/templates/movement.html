@@ -1,291 +1,363 @@
-{% extends 'base-template.html' %}
-{% block content %}
-    <div class="container">
+{% extends 'base-template.html' %} {% block content %}
+<div class="container">
+  <ul
+    class="nav nav-tabs md-tabs nav-justified btn-outline-primary"
+    role="tablist"
+  >
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#panel555" role="tab">
+        <i class=""></i>Resumen</a
+      >
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#panel666" role="tab">
+        <i class=""></i>Logistica</a
+      >
+    </li>
+  </ul>
 
-        <ul class="nav nav-tabs md-tabs nav-justified primary-color" role="tablist">
-            <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#panel555" role="tab">
-                <i class="fas fa-user pr-2"></i>Resumen</a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#panel666" role="tab">
-                <i class="fas fa-heart pr-2"></i>Logistica</a>
-            </li>
-        </ul>
-        
-        <div class="tab-content">        
-        
-            <div class="tab-pane fade in show active" id="panel555" role="tabpanel">
-                <div class="table-wrapper">
-                    <div class="table-title">
-                        <div class="row">
-                            <div class="col-sm-8"><h2>Almacen <b>Resumen</b></h2></div>                            
-                        </div>
-                    </div>        
-                {% if database == None or database|length == 0 %}
-                    <h3 align="center" class="font-weight-light">Resumen aún no disponible.</h3>
-                {% else %}
-                    <table class="table table-bordered" id="summary">
-                        <thead>
-                        <tr>
-                            <th scope="col">Producto</th>
-                            <th scope="col">Almacen</th>
-                            <th scope="col">Cantidad</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <!-- Showing current state (just as index.html -->
-                            {% for data in database %}
-                                {% if data[2] != 0 %}
-                                <tr>
-                                    <td>{{ data[0] }}</td>
-                                    <td>{{ data[1] }}</td>
-                                    <td>{{ data[2] }}</td>
-                                </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
-                </div>
-
-                <div class="d-flex justify-content-center">
-                    <select name="day" id="day" list="days" placeholder="Seleccione el dia" class="form-control" autocomplete="off" required>
-                        <option></option>
-                        {% for day in days %}
-                            <option value="{{ day[0] }}" id="day_{{ day[0] }}">{{ day[0] }}</option>
-                        {% endfor %}
-                    </select>
-                    
-                    <a href="" id='link'>
-                        <button name="button" type="button" class="btn btn-danger" value= "delete" >Generar Reporte</button><br>
-                    </a>
-                </div>
+  <div class="tab-content">
+    <div class="tab-pane fade in show active" id="panel555" role="tabpanel">
+      <div class="table-wrapper" style="border-radius: 1rem;">
+        <div class="table-title">
+          <div class="row">
+            <div class="col-sm-8">
+              <h2>Almacen <b>Resumen</b></h2>
             </div>
+          </div>
+        </div>
+        {% if database == None or database|length == 0 %}
+        <h3 align="center" class="font-weight-light">
+          Resumen aún no disponible.
+        </h3>
+        {% else %}
+        <table
+          class="table table-bordered"
+          id="summary"
+          style="font-size: 1.2vw;"
+        >
+          <thead>
+            <tr>
+              <th scope="col">Producto</th>
+              <th scope="col">Almacen</th>
+              <th scope="col">Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Showing current state (just as index.html -->
+            {% for data in database %} {% if data[2] != 0 %}
+            <tr>
+              <td>{{ data[0] }}</td>
+              <td>{{ data[1] }}</td>
+              <td>{{ data[2] }}</td>
+            </tr>
+            {% endif %} {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
 
-            <div class="tab-pane fade" id="panel666" role="tabpanel">
-                <div class="table-wrapper">
-                    <div class="table-title">
-                        <div class="row">
-                            <div class="col-sm-8"><h2>Almacen <b>Resumen</b></h2></div>
-                            <div class="col-sm-4">
-                                <button type="button" class="btn btn-info add-new" data-toggle="modal" data-target="#new" >
-                                    <i class="fa fa-plus"></i>Añadir nuevo
-                                </button>
-                            </div>
-                        </div>
-                    </div> 
-                <h3 align="center" class="font-weight-light">Hacer movimientos de productos</h3>
-                <form action = "{{ url_for('movement') }}" method = "POST">
-                    <div class="form-row" title="Add logs">
-                        <div class="col">
-                            <select name= "prod_name" id="prod_name" placeholder="Nombre de Producto" class="form-control" autocomplete="off" required autofocus>
-                                <option></option>
-                                {% for product in products %}
-                                    <option value="{{ product[1] }}" id="prod_{{ product[0] }}">{{ product[1] }}</option>
-                                {% endfor %}
-                            </select>        
-                        </div>
-                        <div class="col">
-                            <select name="from_loc" id="from_loc" placeholder="Origen" class="form-control" autocomplete="off" disabled>                                
-                                {% for location in locations %}
-                                <option value="{{ location[1] }}" id="loc_{{ location[0] }}">{{ location[1] }}</option>
-                                {% endfor %}
-                            </select>                    
-                        </div>
-                        <div class="col">
-                            <select name="to_loc" id="to_loc" placeholder="Destino" class="form-control" autocomplete="off" disabled>                              
-                            </select>
-                        </div>
-                        <div class="col slide-container">
-                            <!--input name="quantity" placeholder="Quantity" class="form-control" autocomplete="off" required-->
-                            <input name="quantity" type="range" min="0" value="" class="slider" id="slider_range" required title="Product Range">
-                            <p>Valor: <span id="show_selected"></span>&nbsp;&nbsp;&nbsp;<span id="max_limit" class="font-weight-light"></span></p>
-                        </div>
-                        <div class="col">
-                            <input type= "submit" id="submit" class="btn btn-info btn-group-toggle" value= "enviar" disabled/><br>
-                        </div>
-                        <datalist id="locations_to_from">
-                            {% for location in locations %}
-                                <option value="{{ location[1] }}" id="loc_{{ location[0] }}">
-                            {% endfor %}
-                        </datalist>
-                    </div>            
-                </form>
-        
-                <br><hr><br>
-                <div class="table-title">
-                    <div class="row">
-                        <div class="col-sm-8"><h2>Logistica <b>Historial</b></h2></div>                        
-                    </div>
-                </div>                 
-                {% if logs == None or logs|length == 0 %}
-                    <h3 align="center" class="font-weight-light">Sin datos aún</h3>
-                {% else %}
+      <div class="d-flex justify-content-center">
+        <select
+          name="day"
+          id="day"
+          list="days"
+          placeholder="Seleccione el dia"
+          class="form-control"
+          autocomplete="off"
+          required
+        >
+          <option></option>
+          {% for day in days %}
+          <option value="{{ day[0] }}" id="day_{{ day[0] }}"
+            >{{ day[0] }}</option
+          >
+          {% endfor %}
+        </select>
 
-                    
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">ID_Producto</th>
-                                <th scope="col">Origen</th>
-                                <th scope="col">Destino</th>
-                                <th scope="col">Cantidad</th>
-                                <th scope="col">Tipo</th>
-                                <th scope="col">Fecha y hora</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for log in logs %}
-                                <tr>
-                                    <td>{{ log[0] }}</td>
-                                    <td>{{ log[1] }}</td>
-                                    <td>{{ log[2] }}</td>
-                                    <td>{{ log[3] }}</td>
-                                    <td>{{ log[4] }}</td>
-        
-                                    {% if log[5]=='C' %}
-                                    <td>Compra</td>  
-                                    {% else %}
-                                    <td>Transferencia</td>  
-                                    {% endif %}
-                                                              
-                                    <td>{{ log[6] }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
-                
-            </div></div>
-            
-        
+        <a href="" id="link">
+          <button
+            name="button"
+            type="button"
+            class="btn btn-danger"
+            value="delete"
+          >
+            Generar Reporte</button
+          ><br />
+        </a>
+      </div>
+    </div>
+
+    <div class="tab-pane fade" id="panel666" role="tabpanel">
+      <div class="table-wrapper" style="border-radius: 1rem;">
+        <div class="table-title">
+          <div class="row">
+            <div class="col-sm-8">
+              <h2>Almacen <b>Resumen</b></h2>
             </div>
-        
-        </div>       
-        
-        
+          </div>
+        </div>
+        <h3
+          align="center"
+          style="margin-bottom: 2rem;"
+          class="font-weight-light"
+        >
+          Hacer movimientos de productos
+        </h3>
+        <form action="{{ url_for('movement') }}" method="POST">
+          <div class="form-row" title="Add logs">
+            <div class="col">
+              <select
+                name="prod_name"
+                id="prod_name"
+                placeholder="Nombre de Producto"
+                class="form-control"
+                autocomplete="off"
+                required
+                autofocus
+              >
+                <option></option>
+                {% for product in products %}
+                <option value="{{ product[1] }}" id="prod_{{ product[0] }}"
+                  >{{ product[1] }}</option
+                >
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col">
+              <select
+                name="from_loc"
+                id="from_loc"
+                placeholder="Origen"
+                class="form-control"
+                autocomplete="off"
+                disabled
+              >
+                {% for location in locations %}
+                <option value="{{ location[1] }}" id="loc_{{ location[0] }}"
+                  >{{ location[1] }}</option
+                >
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col">
+              <select
+                name="to_loc"
+                id="to_loc"
+                placeholder="Destino"
+                class="form-control"
+                autocomplete="off"
+                disabled
+              >
+              </select>
+            </div>
+            <div class="col slide-container">
+              <!--input name="quantity" placeholder="Quantity" class="form-control" autocomplete="off" required-->
+              <input
+                name="quantity"
+                type="range"
+                min="0"
+                value=""
+                class="slider btn-block"
+                id="slider_range"
+                required
+                title="Product Range"
+              />
+              <p>
+                Valor: <span id="show_selected"></span>&nbsp;&nbsp;&nbsp;<span
+                  id="max_limit"
+                  class="font-weight-light"
+                ></span>
+              </p>
+            </div>
+            <div class="col">
+              <input
+                type="submit"
+                id="submit"
+                class="btn btn-info btn-group-toggle btn-block"
+                value="enviar"
+                disabled
+              /><br />
+            </div>
+            <datalist id="locations_to_from">
+              {% for location in locations %}
+              <option value="{{ location[1] }}" id="loc_{{ location[0] }}">
+                {% endfor %}
+              </option>
+            </datalist>
+          </div>
+        </form>
 
-    <script>
-        const products = {};
-        // this contains unallocated products
-        {% for product in products %}
-            products["{{ product[1] }}"] = "{{ product[2] }}";
-        {% endfor %}
+        <br />
+        <hr />
+        <br />
+        <div class="table-title">
+          <div class="row">
+            <div class="col-sm-8">
+              <h2>Logistica <b>Historial</b></h2>
+            </div>
+          </div>
+        </div>
+        {% if logs == None or logs|length == 0 %}
+        <h3 align="center" class="font-weight-light">Sin datos aún</h3>
+        {% else %}
 
-        const locations = [];
+        <table class="table" style="font-size: 1vw;">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">ID_Producto</th>
+              <th scope="col">Origen</th>
+              <th scope="col">Destino</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Fecha y hora</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+            <tr>
+              <td>{{ log[0] }}</td>
+              <td>{{ log[1] }}</td>
+              <td>{{ log[2] }}</td>
+              <td>{{ log[3] }}</td>
+              <td>{{ log[4] }}</td>
 
-        {% for location in locations %} 
-            {% if location[2]!=1 %}
-                locations["{{ location[0]-2 }}"] = "{{ location[1] }}";
-            {% endif %}
-        {% endfor %}
-        console.log(locations);
+              {% if log[5]=='C' %}
+              <td>Compra</td>
+              {% else %}
+              <td>Transferencia</td>
+              {% endif %}
 
-        // this contains all allocated products in form --> product: location: quantity
-        let summary = JSON.parse({{ allocated|tojson }});
-        console.log(summary);
+              <td>{{ log[6] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 
-        let slider = document.getElementById("slider_range");
-        let output = document.getElementById("show_selected");
-        let max_limit = document.getElementById("max_limit");
+<script>
+  const products = {};
+  // this contains unallocated products
+  {% for product in products %}
+      products["{{ product[1] }}"] = "{{ product[2] }}";
+  {% endfor %}
 
-        let prod_name = document.getElementById("prod_name");
-        let to_loc = document.getElementById("to_loc");
-        let from_loc = document.getElementById("from_loc");
+  const locations = [];
 
-        let send = document.getElementById("submit");
-        let fech = document.getElementById("day");
-        
-        prod_name.onchange = function() {
-            from_loc.disabled = false;
-            from_loc.value = "";
-        };
+  {% for location in locations %}
+      {% if location[2]!=1 %}
+          locations["{{ location[0]-2 }}"] = "{{ location[1] }}";
+      {% endif %}
+  {% endfor %}
+  console.log(locations);
 
-        fech.onchange = function (){
-            document.getElementById("link")
-            .setAttribute('href', 'movement?type=generate&fech='+this.value)
-            document.getElementById("link")
-            .setAttribute('target', '_blank');
-            
-        }
-        //works fine DON'T TOUCH it lol
-        to_loc.onchange = function() {
-            let max_val;
-            if(!from_loc.value) {
-                max_val = products[(prod_name.value).toString()];
-                slider.setAttribute("max", max_val.toString());
-                max_limit.innerText = "Max: " + max_val;
-                //console.log('to_loc --> from_loc was null ', max_val)
+  // this contains all allocated products in form --> product: location: quantity
+  let summary = JSON.parse({{ allocated|tojson }});
+  console.log(summary);
 
-                if(max_val === 0){
-                    send.disabled = true;
-                }else{
-                    send.disabled = false;
-                }
-            }
-            
-            output.innerHTML = slider.value;
-        };
+  let slider = document.getElementById("slider_range");
+  let output = document.getElementById("show_selected");
+  let max_limit = document.getElementById("max_limit");
 
-        //works fine DON'T TOUCH it lol
-        from_loc.onchange = function(){
-            let max_val;
-            max_val = summary[(prod_name.value).toString()][(from_loc.value).toString()];
-            slider.setAttribute("max", max_val.toString());
-            max_limit.innerText = "Max: " + max_val;
-            //console.log('from_loc --> to location updated ', max_val);
+  let prod_name = document.getElementById("prod_name");
+  let to_loc = document.getElementById("to_loc");
+  let from_loc = document.getElementById("from_loc");
 
-            if(max_val === 0){
-                send.disabled = true;
-            }else{
-                send.disabled = false;
-            }
-            
-            to_loc.disabled = false;
-            to_loc.value = "";
-            output.innerHTML = slider.value;
-            
-            var length = from_loc.options.length;
-            for (i = length-1; i >= 0; i--) {
-                to_loc.options[i] = null;
-            }            
-            let selected = from_loc.value;
+  let send = document.getElementById("submit");
+  let fech = document.getElementById("day");
 
-            for (i = 0; i <=length-2; i++) {
-                let current = locations[i]; 
-                if (current !=selected){
-                    let newOption = new Option(current,current);
-                    to_loc.appendChild(newOption);
-                }
-            }
-            
-            console.log(selected);
-        };
+  prod_name.onchange = function() {
+      from_loc.disabled = false;
+      from_loc.value = "";
+  };
 
-        output.innerHTML = slider.value;
-        slider.oninput = function() {
-            output.innerHTML = this.value;
+  fech.onchange = function (){
+      document.getElementById("link")
+      .setAttribute('href', 'movement?type=generate&fech='+this.value)
+      document.getElementById("link")
+      .setAttribute('target', '_blank');
 
-            let curr_val = parseInt(this.value);
-            let max_val = parseInt(summary[(prod_name.value).toString()][(from_loc.value).toString()].toString());
+  }
+  //works fine DON'T TOUCH it lol
+  to_loc.onchange = function() {
+      let max_val;
+      if(!from_loc.value) {
+          max_val = products[(prod_name.value).toString()];
+          slider.setAttribute("max", max_val.toString());
+          max_limit.innerText = "Max: " + max_val;
+          //console.log('to_loc --> from_loc was null ', max_val)
 
-            if(curr_val === 0){
-                send.disabled = true;
-            }else if(curr_val > max_val){
-                send.disabled = true;
-            }else{
-                send.disabled = false;
-            }
-        };
+          if(max_val === 0){
+              send.disabled = true;
+          }else{
+              send.disabled = false;
+          }
+      }
 
-        /*send.onclick = function() {            
-            to_loc.disabled = true;
-            send.disabled = true;
-            from_loc.value = '-';
-            to_loc.value = '-';
-        }*/
+      output.innerHTML = slider.value;
+  };
 
-    </script>
+  //works fine DON'T TOUCH it lol
+  from_loc.onchange = function(){
+      let max_val;
+      max_val = summary[(prod_name.value).toString()][(from_loc.value).toString()];
+      slider.setAttribute("max", max_val.toString());
+      max_limit.innerText = "Max: " + max_val;
+      //console.log('from_loc --> to location updated ', max_val);
+
+      if(max_val === 0){
+          send.disabled = true;
+      }else{
+          send.disabled = false;
+      }
+
+      to_loc.disabled = false;
+      to_loc.value = "";
+      output.innerHTML = slider.value;
+
+      var length = from_loc.options.length;
+      for (i = length-1; i >= 0; i--) {
+          to_loc.options[i] = null;
+      }
+      let selected = from_loc.value;
+
+      for (i = 0; i <=length-2; i++) {
+          let current = locations[i];
+          if (current !=selected){
+              let newOption = new Option(current,current);
+              to_loc.appendChild(newOption);
+          }
+      }
+
+      console.log(selected);
+  };
+
+  output.innerHTML = slider.value;
+  slider.oninput = function() {
+      output.innerHTML = this.value;
+
+      let curr_val = parseInt(this.value);
+      let max_val = parseInt(summary[(prod_name.value).toString()][(from_loc.value).toString()].toString());
+
+      if(curr_val === 0){
+          send.disabled = true;
+      }else if(curr_val > max_val){
+          send.disabled = true;
+      }else{
+          send.disabled = false;
+      }
+  };
+
+  /*send.onclick = function() {
+      to_loc.disabled = true;
+      send.disabled = true;
+      from_loc.value = '-';
+      to_loc.value = '-';
+  }*/
+</script>
 {% endblock %}

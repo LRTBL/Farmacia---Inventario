@@ -430,7 +430,8 @@ def movement():
                         from ((logistics  as lc
                         inner join products on lc.prod_id = products.prod_id) 
                         inner join location on lc.to_loc_id = location.loc_id )
-                        where trans_time = ? """, str(fech_))
+                        where DATE(trans_time) = ? """, (str(fech_),))
+                        
         data = cursor.fetchall()
         cursor.execute("""select loc_name
                         from logistics  as lc
@@ -465,8 +466,8 @@ def movement():
 
         pdf.setFont("Times-New-Roman", 13)
         pdf.drawString(50, 450, "FECHA: "+fech_)
-        pdf.drawString(50, 430, "GENERADO POR: ..."+gen_apelli+"  "+gen_nombre)
-        pdf.drawString(50, 410, "CARGO: ...")
+        pdf.drawString(50, 430, "GENERADO POR: "+gen_apelli+"  "+gen_nombre)
+        # pdf.drawString(50, 410, "CARGO: ...")ss
 
         pdf.setLineWidth(1)
         pdf.line(50,400,750,400)
@@ -492,10 +493,10 @@ def movement():
         #Establecemos el tamaño de la hoja que ocupará la tabla 
         detalle_orden.wrapOn(pdf, 800, 600)
         #Definimos la coordenada donde se dibujará la tabla
-        detalle_orden.drawOn(pdf, 50,240)
+        detalle_orden.drawOn(pdf, 50,160)
         pdf.showPage()
         pdf.save()
-        return render()
+        # return render()
 
 
 

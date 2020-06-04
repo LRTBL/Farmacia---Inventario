@@ -1,131 +1,237 @@
-{% extends 'base-template.html' %}
-{% block content %}
+{% extends 'base-template.html' %} {% block content %}
 <style>
-    .modal-content{
-        padding: 24px 16%;
-    }
+  .modal-content {
+    padding: 24px 16%;
+  }
 </style>
-    <div class="container">
-        <div class="table-wrapper">
-        <div class="table-title">
-            <div class="row">
-                <div class="col-sm-8"><h2>Productos <b>Detalles</b></h2></div>
-                <div class="col-sm-4">
-                    <button type="button" class="btn btn-info add-new" data-toggle="modal" data-target="#new" >
-                        <i class="fa fa-plus"></i>Añadir nuevo
-                    </button>
-                </div>
-            </div>
+<div class="container">
+  <div class="table-wrapper" style="border-radius: 1rem;">
+    <div class="table-title">
+      <div class="row">
+        <div class="col-sm-8">
+          <h2>Productos <b>Detalles</b></h2>
         </div>
-        <table class="table table-bordered">
-            <thead>
-                <th scope="col">ID</th>
-                <th scope="col">Nombre del Producto</th>
-                <th scope="col">Cantidad Comprada</th>
-                <th scope="col">Acciones</th>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                    <tr>
-                        <td>{{ product[0] }}</td>
-                        <td>{{ product[1] }}</td>
-                        <td>{{ product[2] }}</td>
-                        
-                        <td>
-                            <button name="button" type="button" class="btn btn-success" value= "edit" data-toggle="modal" data-target="#edit_{{ product[0] }}" >
-                                <i class="material-icons">&#xE254;</i>
-                            </button>
-                            <div id="edit_{{ product[0] }}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="trans_message" aria-hidden="true">
-                                <form action="{{ url_for('edit', type='product') }}" method="post" class="base_form">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-body"><input class="form-control" name="prod_name" placeholder="{{ product[1] }}" 
-                                            onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"  maxlength="20" ></div>
-                                        <div class="modal-body">
-                                            <input class="form-control" style="margin-bottom:1rem;" name="prod_quantity" placeholder="{{ product[2] }}" id="input_{{ product[0] }}" type="number" min="100" max="500">
-                                            <script>
-                                                document.getElementById("input_{{ product[0] }}").oninput = function(){
-                                                    let all = document.getElementsByClassName("btn btn-primary");
-                                                    for(let i=0;i<all.length;i++){
-                                                        all[i].disabled = true;
-                                                    }
-                                                    const curr_qty = ;
-                                                    let in_qty = parseInt(document.getElementById("input_{{ product[0] }}").value);
-
-                                                    //console.log(in_qty);
-                                                    //console.log(curr_qty);
-
-                                                    if(in_qty > curr_qty){
-                                                        //console.log("OKAYY");
-                                                        for(let i=0;i<all.length;i++){
-                                                            all[i].disabled = false;
-                                                        }
-                                                    }
-                                                };
-                                            </script>
-                                            <text  class="font-weight-light">(solo incrementar cantidad)</text>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <input name="prod_id" value="{{ product[0] }}" hidden aria-hidden="true">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                </form>
-                            </div>
-                            <a href="{{ url_for('delete', prod_id=product[0], type='product') }}">
-                                <button name="button" type="button" class="btn btn-danger" value= "delete" >
-                                    <i class="material-icons">&#xE872;</i>
-                                </button>
-                            </a>
-                        </td>
-                        
-                    </tr>
-                {% endfor %}
-                    
-            </tbody>
-        </table>
+        <div class="col-sm-4">
+          <button
+            type="button"
+            class="btn btn-info add-new"
+            data-toggle="modal"
+            data-target="#new"
+          >
+            <i class="fa fa-plus"></i>Añadir nuevo
+          </button>
         </div>
+      </div>
     </div>
+    <table class="table table-bordered">
+      <thead>
+        <th scope="col">ID</th>
+        <th scope="col">Nombre del Producto</th>
+        <th scope="col">Cantidad Comprada</th>
+        <th scope="col">Acciones</th>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td>{{ product[0] }}</td>
+          <td>{{ product[1] }}</td>
+          <td>{{ product[2] }}</td>
 
-    <div id="new" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="trans_message" aria-hidden="true">
-        <form action="{{ url_for('product') }}" method="post" class="base_form">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="col-sm-10"><h2>Añadir <b>Producto</b></h2></div>
-                <div class="modal-body d-flex justify-content-center"><input name = "prod_name" class="form-control" placeholder="Nombre del Producto"
-                    onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"  maxlength="20" required autofocus></div>
-                <div class="modal-body d-flex justify-content-center"><input name = "prod_quantity" class="form-control" placeholder="Cantidad" type="number" min="100" max="500" required></div>
-                <div class="modal-body d-flex justify-content-center">
-                    <select name="prov" class="form-control" placeholder="Tipo" required hidden>
-                        <option value="A">Admin</option>
-                        <option value="E">Empleado</option>
-                    </select>    
-                </div>
+          <td>
+            <button
+              name="button"
+              type="button"
+              class="btn btn-success"
+              value="edit"
+              style="width: 50%;"
+              data-toggle="modal"
+              data-target="#edit_{{ product[0] }}"
+            >
+              <i class="material-icons">&#xE254;</i>
+            </button>
+            <div
+              id="edit_{{ product[0] }}"
+              class="modal fade"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="trans_message"
+              aria-hidden="true"
+            >
+              <form
+                action="{{ url_for('edit', type='product') }}"
+                method="post"
+                class="base_form"
+              >
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-body">
+                      <input
+                        class="form-control"
+                        name="prod_name"
+                        placeholder="{{ product[1] }}"
+                        onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"
+                        maxlength="20"
+                      />
+                    </div>
 
-                <div class="modal-footer">                    
-                    <button type="button" class="btn btn-default " data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" value= "enviar">Crear</button>
+                    <div class="modal-body">
+                      <input
+                        class="form-control"
+                        style="margin-bottom: 1rem;"
+                        name="prod_quantity"
+                        placeholder="{{ product[2] }}"
+                        id="input_{{ product[0] }}"
+                        type="number"
+                        min="100"
+                        max="500"
+                      />
+                      <script>
+                        document.getElementById("input_{{ product[0] }}").oninput = function(){
+                            let all = document.getElementsByClassName("btn btn-primary");
+                            for(let i=0;i<all.length;i++){
+                                all[i].disabled = true;
+                            }
+                            const curr_qty = ;
+                            let in_qty = parseInt(document.getElementById("input_{{ product[0] }}").value);
+
+                            //console.log(in_qty);
+                            //console.log(curr_qty);
+
+                            if(in_qty > curr_qty){
+                                //console.log("OKAYY");
+                                for(let i=0;i<all.length;i++){
+                                    all[i].disabled = false;
+                                }
+                            }
+                        };
+                      </script>
+                      <text class="font-weight-light"
+                        >(solo incrementar cantidad)</text
+                      >
+                    </div>
+                    <div class="modal-footer">
+                      <input
+                        name="prod_id"
+                        value="{{ product[0] }}"
+                        hidden
+                        aria-hidden="true"
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal"
+                      >
+                        Cerrar
+                      </button>
+                      <button type="submit" class="btn btn-primary btn-block">
+                        Guardar Cambios
+                      </button>
+                    </div>
+                  </div>
                 </div>
+              </form>
             </div>
-        </div>
-        </form>
-    </div>
+            <a
+              href="{{ url_for('delete', prod_id=product[0], type='product') }}"
+            >
+              <button
+                name="button"
+                style="width: 80%; margin-right: 2rem;"
+                type="button"
+                class="btn btn-danger"
+                value="delete"
+              >
+                <i class="material-icons">&#xE872;</i>
+              </button>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    <script>
-        let close = document.getElementsByClassName("btn btn-default");
-        for(let i=0; i<close.length; i++){
-            close[i].onclick = function () {
-                let clear_fields = document.getElementsByClassName("base_form");
-                for(let i=0;i<clear_fields.length;i++){
-                    clear_fields[i].reset();
-                }
-                let all = document.getElementsByClassName("btn btn-primary");
-                for(let i=0;i<all.length;i++){
-                    all[i].disabled = false;
-                }
-            }
-        }
-    </script>
+<div
+  id="new"
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="trans_message"
+  aria-hidden="true"
+>
+  <form action="{{ url_for('product') }}" method="post" class="base_form">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="col-sm-10">
+          <h2>Añadir <b>Producto</b></h2>
+        </div>
+        <div class="modal-body d-flex justify-content-center">
+          <input
+            name="prod_name"
+            class="form-control"
+            placeholder="Nombre del Producto"
+            onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"
+            maxlength="20"
+            required
+            autofocus
+          />
+        </div>
+
+        <div class="modal-body d-flex justify-content-center">
+          <input
+            name="prod_quantity"
+            class="form-control"
+            placeholder="Cantidad"
+            type="number"
+            min="100"
+            max="500"
+            required
+          />
+        </div>
+        <div class="modal-body d-flex justify-content-center">
+          <select
+            name="prov"
+            class="form-control"
+            placeholder="Tipo"
+            required
+            hidden
+          >
+            <option value="A">Admin</option>
+            <option value="E">Empleado</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Cerrar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            value="enviar"
+          >
+            Crear
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  let close = document.getElementsByClassName("btn btn-default");
+  for (let i = 0; i < close.length; i++) {
+    close[i].onclick = function () {
+      let clear_fields = document.getElementsByClassName("base_form");
+      for (let i = 0; i < clear_fields.length; i++) {
+        clear_fields[i].reset();
+      }
+      let all = document.getElementsByClassName("btn btn-primary");
+      for (let i = 0; i < all.length; i++) {
+        all[i].disabled = false;
+      }
+    };
+  }
+</script>
 {% endblock %}
