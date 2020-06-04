@@ -6,7 +6,12 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
         <link rel="icon" href="{{ url_for('static', filename='site_icon.png') }}" class="js-favicon">
         <link href="https://fonts.googleapis.com/css2?family=Work+Sans&display=swap" rel="stylesheet"> 
-        
+
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+                
         <script src="{{ url_for('static', filename='jquery-3.3.1.slim.min.js') }}"></script>
         <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
         {% if title == 'ProductMovement' %}
@@ -52,13 +57,85 @@
                 background: radial-gradient(circle, rgba(194,189,189,1) 0%, rgba(196,196,196,1) 43%, rgba(164,164,164,1) 76%, rgba(85,85,85,1) 100%);
                 font-family: 'Work Sans', sans-serif;
             }
+                    .table-wrapper {
+                
+                margin: 30px auto;
+                background: #fff;
+                padding: 20px;	
+                box-shadow: 0 1px 1px rgba(0,0,0,.05);
+            }
+            .table-title {
+                padding-bottom: 10px;
+                margin: 0 0 10px;
+            }
+            .table-title h2 {
+                margin: 6px 0 0;
+                font-size: 22px;
+            }
+            .table-title .add-new {
+                float: right;
+                height: 30px;
+                font-weight: bold;
+                font-size: 12px;
+                text-shadow: none;
+                min-width: 100px;
+                border-radius: 50px;
+                line-height: 13px;
+            }
+            .table-title .add-new i {
+                margin-right: 4px;
+            }
+            table.table {
+                table-layout: fixed;
+            }
+            table.table tr th, table.table tr td {
+                border-color: #e9e9e9;
+            }
+            table.table th i {
+                font-size: 13px;
+                margin: 0 5px;
+                cursor: pointer;
+            }
+            table.table th:first-child {
+                width: 50px;
+            }
+            table.table th:last-child {
+                width: 115px;
+            }
+            table.table td a {
+                float: right;
+            }    
+            th {
+                width: 20%;
+            }
+            table.table td i {
+                font-size: 19px;
+            }
+            table.table td a.add i {
+                font-size: 24px;
+                margin-right: -1px;
+                position: relative;
+                top: 3px;
+            }    
+            table.table .form-control {
+                height: 32px;
+                line-height: 32px;
+                box-shadow: none;
+                border-radius: 2px;
+            }
+            table.table .form-control.error {
+                border-color: #f50000;
+            }
+            table.table td .add {
+                display: none;
+            }
 
             .container { padding-top: 70px; }
         </style>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="position: fixed;width: 100%;z-index: 2;">
-            <a class="navbar-brand" href="{{ link.home }}">Farmacia Lerietbool</a>            
+            <a class="navbar-brand" href="{{ link.home }}">Farmacia | </a>            
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -66,19 +143,19 @@
                 <ul class="navbar-nav mr-auto bg-dark alert-light">{{ title }}</ul>
                 
                 <div class="col-auto">
-                  <button type="button" class="btn btn-primary" onclick="location.reload();location.href='{{ link.user }}'">Usuarios</button>
+                  <button type="button" style="margin-bottom:0.2rem;" class="btn btn-primary btn-block" onclick="location.reload();location.href='{{ link.user }}'">Usuarios</button>
                   </div>
                 <div class="col-auto">
-                  <button type="button" class="btn btn-primary" onclick="location.reload();location.href='{{ link.location }}'">Almacenes</button>
+                  <button type="button"style="margin-bottom:0.2rem;" class="btn btn-primary btn-block" onclick="location.reload();location.href='{{ link.location }}'">Sucursales</button>
                 </div>
                 <div class="col-auto">
-                  <button type="button" class="btn btn-primary" onclick="location.reload();location.href='{{ link.product }}'">Productos</button>
+                  <button type="button" style="margin-bottom:0.2rem;" class="btn btn-primary btn-block" onclick="location.reload();location.href='{{ link.product }}'">Productos</button>
                 </div>
                 <div class="col-auto">
-                  <button type="button" class="btn btn-primary" onclick="location.reload();location.href='{{ link.movement }}'">Inventario</button>
+                  <button type="button" style="margin-bottom:0.2rem;" class="btn btn-primary btn-block" onclick="location.reload();location.href='{{ link.movement }}'">Inventario</button>
                 </div>
                 <div class="col-auto">
-                  <button type="button" class="btn btn-secondary" onclick="location.reload();location.href='/logout'">Cerrar Sesión</button>
+                  <button type="button" style="margin-bottom:0.2rem;" class="btn btn-secondary btn-block" onclick="location.reload();location.href='/logout'">Cerrar Sesión</button>
                 </div>
             </div>
 	    </nav>

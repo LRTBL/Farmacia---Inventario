@@ -5,6 +5,14 @@ import sqlite3
 from flask import Flask, url_for, request, redirect, session
 from flask import render_template as render
 
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.pdfbase.ttfonts import TTFont 
+from reportlab.pdfbase import pdfmetrics
+from reportlab.lib.styles import (ParagraphStyle, getSampleStyleSheet)
+
 DATABASE_NAME = 'inventory.sqlite'
 
 app = Flask(__name__)
@@ -248,7 +256,7 @@ def location():
 
             return redirect(url_for('location'))
 
-    return render('location.html', link=link, warehouses=warehouse_data, transaction_message=msg, title="Almacenes")
+    return render('location.html', link=link, warehouses=warehouse_data, transaction_message=msg, title="Sucursales")
 
 
 @app.route('/movement', methods=['POST', 'GET'])
@@ -414,6 +422,83 @@ def movement():
         print(gen_nombre)
         print(gen_apelli)
 
+        init_database()
+        msg = None
+        db = sqlite3.connect(DATABASE_NAME)
+        cursor = db.cursor()
+        cursor.execute("""select trans_id, prod_name, from_loc_id, loc_name, lc.prod_quantity, tipo, lc.trans_time
+                        from ((logistics  as lc
+                        inner join products on lc.prod_id = products.prod_id) 
+                        inner join location on lc.to_loc_id = location.loc_id )
+                        where trans_time = ? """, str(fech_))
+        data = cursor.fetchall()
+        cursor.execute("""select loc_name
+                        from logistics  as lc
+                        inner join location on lc.from_loc_id = location.loc_id
+                        """)
+        data3 = cursor.fetchall()
+        lst2 = list(data3)
+        j=0
+        for i in range(len(data)):
+            pero = data[i]
+            lst = list(pero)
+            if lst[2] == None:
+                lst[2]  =  "-"
+            else:
+                lst[2]  = lst2[j][0]
+                j=j+1
+            if lst[5] == 'C':
+                lst[5] = 'Compra'
+            elif lst[5] == 'T':
+                lst[5] = 'Transferencia'
+            fecha = lst[6]
+            lst[6] = fecha[10:]
+            data[i] = tuple(lst)
+            
+        pdf = canvas.Canvas(fech_+'.pdf', pagesize=(landscape(letter)))
+        archivo_imagen = './static/logos.jpg'
+        pdf.drawImage(archivo_imagen, 50, 500, width=80, height=80)
+        pdfmetrics.registerFont(TTFont('Times-New-Roman','c:\\windows\\fonts\\times.ttf'))
+        
+        pdf.setFont("Times-New-Roman", 25)
+        pdf.drawString(200, 525, "LISTADO DE INVENTARIO LERIETBOOL")
+
+        pdf.setFont("Times-New-Roman", 13)
+        pdf.drawString(50, 450, "FECHA: "+fech_)
+        pdf.drawString(50, 430, "GENERADO POR: ..."+gen_apelli+"  "+gen_nombre)
+        pdf.drawString(50, 410, "CARGO: ...")
+
+        pdf.setLineWidth(1)
+        pdf.line(50,400,750,400)
+        pdf.setLineWidth(1)
+        pdf.line(50,470,750,470)
+
+
+        encabezados = ('ID', 'PRODUCTO','ORIGEN','DESTINO','CANTIDAD', 'TIPO','HORA')
+        y = 420
+        detalle_orden = Table([encabezados] + data, colWidths=[40, 140,140,140,80,90,70],rowHeights=22)
+        detalle_orden.setStyle(TableStyle(
+            [
+                #La primera fila(encabezados) va a estar centrada
+                ('ALIGN',(0,0),(6,0),'CENTER'),
+                ('BACKGROUND',(0,0),(6,0),colors.gray),
+                #Los bordes de todas las celdas serán de color negro y con un grosor de 1
+                ('GRID', (0, 0), (-1, -1), 1, colors.black), 
+                #El tamaño de las letras de cada una de las celdas será de 10
+                ('FONTSIZE', (0, 0), (-1, -1), 12),
+                ('FONT', (0, 0), (-1, -1), 'Times-New-Roman'),
+            ]
+        ))
+        #Establecemos el tamaño de la hoja que ocupará la tabla 
+        detalle_orden.wrapOn(pdf, 800, 600)
+        #Definimos la coordenada donde se dibujará la tabla
+        detalle_orden.drawOn(pdf, 50,240)
+        pdf.showPage()
+        pdf.save()
+        return render()
+
+
+
     return render('movement.html', title="Movimientos de Productos", link=link, trans_message=msg,
                   products=products, locations=locations, days=days, allocated=alloc_json,
                   logs=logistics_data, database=log_summary)
@@ -452,21 +537,21 @@ def delete():
             UPDATE products SET unallocated_quantity = unallocated_quantity + ? WHERE prod_id = ?
             """, (all_place[products_], products_))
 
-        cursor.execute("DELETE FROM location WHERE loc_id == ?", str(id_))
+        cursor.execute("DELETE FROM location WHERE loc_id == ?", (str(id_),))
         db.commit()
 
         return redirect(url_for('location'))
 
     elif type_ == 'product':
         id_ = request.args.get('prod_id')
-        cursor.execute("DELETE FROM products WHERE prod_id == ?", str(id_))
+        cursor.execute("DELETE FROM products WHERE prod_id == ?", (str(id_),))
         db.commit()
 
         return redirect(url_for('product'))
     
     elif type_ == 'user':
         id_ = request.args.get('user_id')
-        cursor.execute("DELETE FROM user WHERE idUsuario == ?", str(id_))
+        cursor.execute("DELETE FROM user WHERE idUsuario == ?", (str(id_),))
         db.commit()
 
         return redirect(url_for('user'))

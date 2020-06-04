@@ -1,12 +1,29 @@
 {% extends "base-template.html" %} 
 {% block content%}
+<style>
+    .modal-content{
+        padding: 24px 16%;
+    }
+</style>
 <div class="container">
-    <table class="table">
+    <div class="table-wrapper">
+    <div class="table-title">
+        <div class="row">
+            <div class="col-sm-8"><h2>Usuarios <b>Detalles</b></h2></div>
+            <div class="col-sm-4">
+                <button type="button" class="btn btn-info add-new" data-toggle="modal" data-target="#new" >
+                    <i class="fa fa-plus"></i>Añadir nuevo
+                </button>
+            </div>
+        </div>
+    </div>
+    <table class="table table-bordered">
         <thead>
             <th scope="col">ID</th>
             <th scope="col">Usuario</th>
             <th scope="col">Nombre</th>            
             <th scope="col">Tipo</th>
+            <th scope="col">Acciones</th>
         </thead>
         <tbody>
             {% for user in users %}
@@ -19,25 +36,24 @@
                     <td>Admin</td>
                     {% elif user[5]=='E' %}
                     <td>Empleado</td>
-                    {% endif %}                    
-                    
+                    {% endif %}  
+
                     <td>
-                        <a href="{{ url_for('delete', user_id=user[0], type='user') }}">
-                            <button name="button" type="button" class="btn btn-danger" value= "delete" >eliminar</button><br>
-                        </a>
-                    </td>
-                    <td>
-                        <button name="button" type="button" class="btn btn-success" value= "edit" data-toggle="modal" data-target="#edit_{{ user[0] }}" >editar</button><br>
+                        <button name="button" type="button" class="btn btn-success" value= "edit" data-toggle="modal" data-target="#edit_{{ user[0] }}" >
+                            <i class="material-icons">&#xE254;</i>
+                        </button>
                         <div id="edit_{{ user[0] }}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="trans_message" aria-hidden="true">
                             <form action="{{ url_for('edit', type='user') }}" method="post" class="base_form">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
-                                    <div class="modal-body"><input name="username" placeholder="{{ user[1] }}" disabled></div>
-                                    <div class="modal-body"><input name="new_password" placeholder="nueva contraseña" type="password"></div>
-                                    <div class="modal-body"><input name="name" placeholder="{{ user[3] }}"></div>
-                                    <div class="modal-body"><input name="lastname" placeholder="{{ user[4] }}"></div>
-                                    <div class="modal-body">
-                                        <select name="tipe" placeholder="{{ user[5] }}">
+                                    <div class="modal-body d-flex justify-content-center"><input  class="form-control" name="username" placeholder="{{ user[1] }}" disabled></div>
+                                    <div class="modal-body d-flex justify-content-center"><input  class="form-control" name="new_password" placeholder="nueva contraseña" type="password"></div>
+                                    <div class="modal-body d-flex justify-content-center"><input  class="form-control" name="name" placeholder="{{ user[3] }}" 
+                                        onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123)|| event.charCode == 32"  maxlength="25"></div>
+                                    <div class="modal-body d-flex justify-content-center"><input class="form-control" name="lastname" placeholder="{{ user[4] }}0"
+                                        onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"  maxlength="25"></div>
+                                    <div class="modal-body d-flex justify-content-center">
+                                        <select class="form-control" name="tipe" placeholder="{{ user[5] }}">
                                             <option value="A">Admin</option>
                                             <option value="E">Empleado</option>
                                         </select>
@@ -45,14 +61,20 @@
 
                                     <div class="modal-footer">
                                         <input name="user_id" value="{{ user[0] }}" hidden aria-hidden="true">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                        <button type="button" class="btn btn-default btn-block" data-dismiss="modal">Cerrar</button>
+                                            <button type="submit" class="btn btn-primary btn-block">Guardar Cambios</button>
                                     </div>
                                 </div>
                             </div>
                             </form>
                         </div>
+                        <a href="{{ url_for('delete', user_id=user[0], type='user') }}">
+                            <button name="button" type="button" class="btn btn-danger" value= "delete" >
+                                <i class="material-icons">&#xE872;</i>
+                            </button><br>
+                        </a>
                     </td>
+                 
                 </tr>
             {% endfor %}
             <!-- Inserting data -->         
@@ -61,30 +83,34 @@
         </tbody>
     </table>
 
-    <form action = "{{ url_for('user') }}" method = "POST">
-        <td></td>
-        <td>
-            <input name = "name" placeholder="Nombres" required autofocus>
-        </td>
-        <td>
-            <input name = "lastname" placeholder="Apellidos" required>
-        </td>
-        <td>
-            <input name = "username" placeholder="Nombre de Usuario" required>
-        </td>
-        <td>
-            <input name = "password" placeholder="Contraseña" type="password" required>
-        </td>
-        <td>
-            <select name = "tipe" list="tipes" placeholder="Tipo" required>
-                <option value="A">Admin</option>
-                <option value="E">Empleado</option>
-            </select>
-        </td>                   
-        <td>
-            <input type= "submit" class="btn btn-info btn-group-toggle" value= "enviar" /><br>
-        </td>
-    </form>
+
+    <div id="new" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="trans_message" aria-hidden="true">
+        <form action="{{ url_for('user') }}" method="post" class="base_form">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="col-sm-10"><h2>Añadir <b>Usuario</b></h2></div>
+                <div class="modal-body d-flex justify-content-center"><input name="name" class="form-control" placeholder="Nombres" 
+                    onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || event.charCode == 32"  maxlength="25"  required autofocus></div>
+                <div class="modal-body d-flex justify-content-center"><input name="lastname" class="form-control" placeholder="Apellidos" 
+                    onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123)|| event.charCode == 32"  maxlength="25"maxlength="25" required></div>
+                <div class="modal-body d-flex justify-content-center"><input name="username" class="form-control" placeholder="Nombre de Usuario" maxlength="12" required></div>
+                <div class="modal-body d-flex justify-content-center"><input name="password" class="form-control" placeholder="Contraseña" type="password" maxlength="10" required></div>
+                <div class="modal-body d-flex justify-content-center">
+                    <select name="tipe" class="form-control" placeholder="Tipo" required>
+                        <option value="A">Admin</option>
+                        <option value="E">Empleado</option>
+                    </select>    
+                </div>
+
+                <div class="modal-footer">                    
+                    <button type="button" class="btn btn-default btn-block" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary btn-block" value= "enviar">Crear</button>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
 </div>
 <script>
     let close = document.getElementsByClassName("btn btn-default");
@@ -101,5 +127,4 @@
         }
     }
 </script>
-
 {% endblock%}
