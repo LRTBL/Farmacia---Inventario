@@ -2,9 +2,9 @@ import os
 import json
 import sqlite3
 
+import flask
 from flask import Flask, url_for, request, redirect, session
 from flask import render_template as render
-
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
