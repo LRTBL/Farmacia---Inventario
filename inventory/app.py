@@ -24,7 +24,6 @@ app.config.from_mapping(
 link = {x: x for x in ["home", "user", "location", "product", "movement"]}
 link["index"] = '/'
 
-
 def init_database():
     db = sqlite3.connect(DATABASE_NAME)
     cursor = db.cursor()
@@ -456,8 +455,9 @@ def movement():
             lst[6] = fecha[10:]
             data[i] = tuple(lst)
             
-        pdf = canvas.Canvas(fech_+'.pdf', pagesize=(landscape(letter)))
-        archivo_imagen = './static/logos.jpg'
+        pdf = canvas.Canvas('.\\inventory\\static\\'+fech_+'.pdf', pagesize=(landscape(letter)))
+        
+        archivo_imagen = '.\\inventory\\static\\logos.jpg'
         pdf.drawImage(archivo_imagen, 50, 500, width=80, height=80)
         pdfmetrics.registerFont(TTFont('Times-New-Roman','c:\\windows\\fonts\\times.ttf'))
         
@@ -496,7 +496,8 @@ def movement():
         detalle_orden.drawOn(pdf, 50,160)
         pdf.showPage()
         pdf.save()
-        # return render()
+        return redirect('.\\static\\'+fech_+'.pdf')
+      
 
 
 

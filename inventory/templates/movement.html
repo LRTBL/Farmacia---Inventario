@@ -38,7 +38,7 @@
         >
           <thead>
             <tr>
-              <th scope="col">Producto</th>
+              <th scope="col" style="width: 10%;">Producto</th>
               <th scope="col">Almacen</th>
               <th scope="col">Cantidad</th>
             </tr>
@@ -48,7 +48,7 @@
             {% for data in database %} {% if data[2] != 0 %}
             <tr>
               <td>{{ data[0] }}</td>
-              <td>{{ data[1] }}</td>
+              <td>{{ data[1] }}</td> 
               <td>{{ data[2] }}</td>
             </tr>
             {% endif %} {% endfor %}
