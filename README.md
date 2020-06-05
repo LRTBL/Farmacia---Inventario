@@ -8,8 +8,9 @@ La _index page_ o _summary_ cubre el resumen del sistema que contiene listas de 
 En la página de productos, podemos agregar / editar / eliminar productos del sistema. La página de ubicación cubre una funcionalidad similar en el contexto de ubicaciones o almacenes.
 En la _página de logística_, se puede realizar el movimiento de productos. También mantiene el historial de todas las transacciones en forma de tabla.
 
-## Dependencias
+## Requisitos
 
-  - Solo Flask\!
+  - Flask y Reportlab (install.cmd)
+  - Solo Python 3.6.1
 
 
